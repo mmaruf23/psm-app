@@ -1,0 +1,10 @@
+Component Shad-cn yang mungkin bakalan kepake : 
+- Button : dipake sama komponen lain juga ini mah.
+- Sonner : buat notifikasi simple.
+- Dialog : buat form mini misal set / update kode toko. 
+
+Halaman yang mungkin dibikin : 
+- Dashboard : isinya tampilan list psm yang tersedia, periode berjalan dan minggu sebelumnya.
+- Target next week : Target next week, ya pertoko. anjir lah jadi pr. nyusul aja ini mah.
+- About : 
+- 
