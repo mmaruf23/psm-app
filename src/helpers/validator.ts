@@ -13,12 +13,12 @@ export const isValidProgramCode = (s: string): boolean => {
 
   return (
     a >= 25 &&
-    a <= 99 && // 25–99
+    a <= 30 && // 25–30
     b >= 1 &&
     b <= 12 && // 01–12
     c >= 1 &&
     c <= 4 && // 1–4
     d >= 1 &&
-    d <= 99 // 001–099
+    d <= 20 // 001–099
   );
 };

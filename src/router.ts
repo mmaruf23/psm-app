@@ -1,7 +1,7 @@
 import { createBrowserRouter } from 'react-router';
-import App from './App';
-import Home from './components/content/home';
-import TargetPage from './components/content/target';
+import App from '@/App';
+import ArchiveContent from '@/components/content/archive';
+import TargetContent from '@/components/content/target';
 
 const router = createBrowserRouter([
   {
@@ -10,15 +10,15 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        Component: Home,
+        Component: ArchiveContent,
       },
       {
         path: 'before',
-        Component: Home,
+        Component: ArchiveContent,
       },
       {
         path: 'target',
-        Component: TargetPage,
+        Component: TargetContent,
       },
     ],
   },

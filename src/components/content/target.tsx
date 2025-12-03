@@ -1,5 +1,5 @@
-const TargetPage = () => {
-  return <div>Ini Target Page</div>;
+const TargetContent = () => {
+  return <div>Ini Target Content</div>;
 };
 
-export default TargetPage;
+export default TargetContent;

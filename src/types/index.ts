@@ -12,16 +12,10 @@ type ErrorResponse = {
 
 export type ApiResponse<T = unknown> = SuccessResponse<T> | ErrorResponse;
 
-export type PluData = {
+export type StoreData = {
   kd_store: string;
   nama_store: string;
   cabang: string;
-  personel: string;
-  kode_program: string;
-  nama_program: string;
-  plu: string;
-  descp: string;
-  target: string;
 };
 
 export type ProgramData = {
@@ -31,28 +25,6 @@ export type ProgramData = {
     plu: string;
     descp: string;
   }[];
-};
-
-export type RawArchiveData = {
-  kd_cabang: string;
-  nik: string;
-  nama: string;
-  kd_jabatan: string;
-  jabatan: string;
-  asq: string;
-  target_min: string;
-  qty_act: string;
-  pct: string;
-  pos_umum: string;
-  pos_branch: string;
-  pos_region: string;
-  pos_nas: string;
-  status: string;
-  kd_store: string;
-  status_umum: string;
-  status_branch: string;
-  status_regional: string;
-  status_nas: string;
 };
 
 export type ArchiveData = {

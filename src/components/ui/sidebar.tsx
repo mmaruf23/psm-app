@@ -28,13 +28,20 @@ const Sidebar = () => {
   ];
   return (
     <>
-      <div className="bg-chart-3 md:block p-4 hidden w-40 md:w-64">
-        <ul className="flex flex-col gap-3">
+      <div className="bg-chart-1 md:block pt-10 pl-8 hidden w-40 md:w-60 lg:w-72">
+        <ul className="flex flex-col gap-5">
           {links.map((link, i) => (
             <li key={i}>
-              <NavLink to={link.href} className="flex gap-2">
-                {link.icon}
-                <p>{link.label}</p>
+              <NavLink
+                to={link.href}
+                className={({ isActive }) =>
+                  isActive ? 'text-white' : 'text-black'
+                }
+              >
+                <div className="flex gap-2">
+                  {link.icon}
+                  <span>{link.label}</span>
+                </div>
               </NavLink>
             </li>
           ))}
