@@ -1,8 +1,10 @@
 import { fetchArchiveData, fetchProgramData } from "@/helpers/fetcher";
-import { parseItemProgramName } from "@/helpers/parser";
 import type { ArchiveData, ProgramData } from "@/types";
 import { useState } from "react";
 import { toast } from "sonner";
+import CashierList from "../ui/cashier_list";
+import ItemList from "../ui/item_list";
+import ProgramList from "../ui/program_list";
 
 const ArchiveContent = () => {
   const [programData, setProgramData] = useState<ProgramData[]>([]);
@@ -46,7 +48,7 @@ const ArchiveContent = () => {
   };
 
   if (!localStorage.getItem("kode_toko")) {
-    return <div>silahkan set kode toko terlebih dahulu</div>;
+    return <div className="flex justify-center mt-20">silahkan set kode toko terlebih dahulu</div>;
   }
 
   if (programData.length === 0) {
@@ -57,25 +59,15 @@ const ArchiveContent = () => {
     <div className="flex flex-col h-full gap-4">
       <div className="min-h-20 flex flex-wrap gap-4 items-center">
         {programData.map((p, i) => (
-          <div
-            key={i}
-            className={`outline-2 p-2 ${i === pickedProgram ? "outline-white" : "outline-black"}`}
-            onClick={() => handlePick(i)}
-          >
-            {parseItemProgramName(p.items[0].descp)}
-          </div>
+          <ProgramList key={i} i={i} handlePick={handlePick} picked={i === pickedProgram} programData={p} />
         ))}
       </div>
       <div className="grow outline outline-black flex gap-4">
         <div className="hidden md:block md:w-[25%] outline-1 outline-white">
           <span>List Item :</span>
           <ul>
-            {programData[pickedProgram]?.items.map((item) => (
-              <li key={item.plu}>
-                <span>
-                  {item.plu} {item.descp}
-                </span>
-              </li>
+            {programData[pickedProgram]?.items.map((item, i) => (
+              <ItemList key={i} item={item} />
             ))}
           </ul>
         </div>
@@ -91,20 +83,7 @@ const ArchiveContent = () => {
             <span className="w-1/12">REG</span>
             <span className="w-1/12">NAS</span>
           </div>
-          {archiveData &&
-            archiveData.cashier.map((acv, i) => (
-              <div key={i} className="flex">
-                <span className="w-1/12">{acv.nik}</span>
-                <span className="w-3/12">{acv.nama}</span>
-                <span className="w-2/12">{acv.jabatan}</span>
-                <span className="w-1/12">{acv.qty_act}</span>
-                <span className="w-1/12">{acv.pct}</span>
-                <span className="w-1/12">{acv.pos_umum}</span>
-                <span className="w-1/12">{acv.pos_branch}</span>
-                <span className="w-1/12">{acv.pos_region}</span>
-                <span className="w-1/12">{acv.pos_nas}</span>
-              </div>
-            ))}
+          {archiveData && archiveData.cashier.map((acv, i) => <CashierList key={i} acv={acv} />)}
         </div>
       </div>
     </div>
