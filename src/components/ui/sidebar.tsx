@@ -1,10 +1,6 @@
-import {
-  ArrowLeftCircleIcon,
-  ArrowRightCircleIcon,
-  HomeIcon,
-} from 'lucide-react';
-import type { JSX } from 'react';
-import { NavLink } from 'react-router';
+import { ArrowLeftCircleIcon, ArrowRightCircleIcon, HomeIcon } from "lucide-react";
+import type { JSX } from "react";
+import { NavLink } from "react-router";
 
 type Link = {
   icon: JSX.Element;
@@ -14,29 +10,27 @@ type Link = {
 
 const Sidebar = () => {
   const links: Link[] = [
-    { label: 'Home', href: '/', icon: <HomeIcon /> },
+    { label: "Home", href: "/", icon: <HomeIcon /> },
     {
-      label: 'Periode Sebelumnya',
-      href: '/before',
+      label: "Periode Sebelumnya",
+      href: "/before",
       icon: <ArrowLeftCircleIcon />,
     },
     {
-      label: 'Target Next Periode',
-      href: '/target',
+      label: "Target Next Periode",
+      href: "/target",
       icon: <ArrowRightCircleIcon />,
     },
   ];
   return (
     <>
-      <div className="bg-chart-1 md:block pt-10 pl-8 hidden w-40 md:w-60 lg:w-72">
+      <div className="md:block pt-10 pl-8 hidden w-40 md:w-60 lg:w-72">
         <ul className="flex flex-col gap-5">
           {links.map((link, i) => (
             <li key={i}>
               <NavLink
                 to={link.href}
-                className={({ isActive }) =>
-                  isActive ? 'text-white' : 'text-black'
-                }
+                className={({ isActive }) => (isActive ? "text-white font-semibold" : "text-black")}
               >
                 <div className="flex gap-2">
                   {link.icon}
