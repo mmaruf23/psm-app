@@ -1,9 +1,9 @@
-import { SettingsIcon, MSquare } from 'lucide-react';
+import { SettingsIcon, MSquare } from "lucide-react";
 
 const Topbar = () => {
   return (
     <>
-      <div className="flex justify-between items-center h-16 md:h-20 px-5 md:px-10 bg-chart-1">
+      <div className="flex justify-between items-center min-h-16 md:min-h-20 px-6 md:px-10 bg-chart-1">
         <div className="w-20">
           <MSquare />
         </div>
