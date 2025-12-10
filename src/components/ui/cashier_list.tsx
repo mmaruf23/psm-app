@@ -7,7 +7,7 @@ type Props = {
 
 const CashierList: FC<Props> = ({ acv }) => {
   return (
-    <div className="flex">
+    <div className="flex bg-chart-5 font-semibold py-2 rounded">
       <span className="w-1/12">{acv.nik}</span>
       <span className="w-3/12">{acv.nama}</span>
       <span className="w-2/12">{acv.jabatan}</span>

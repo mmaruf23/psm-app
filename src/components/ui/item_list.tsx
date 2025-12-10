@@ -9,8 +9,8 @@ type Props = {
 
 const ItemList: FC<Props> = ({ item }) => {
   return (
-    <li>
-      <span>
+    <li className="mb-2">
+      <span className="line-clamp-1">
         {item.plu} {item.descp}
       </span>
     </li>

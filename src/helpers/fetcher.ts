@@ -1,25 +1,28 @@
-import type { ApiResponse, ArchiveData, ProgramData } from "@/types";
+import type { ApiResponse, ArchiveData, ProgramData, SuccessResponse } from "@/types";
 import { parsePeriodeType } from "./parser";
-import { dummyArchiveDataResponse, dummyProgramDataResponse } from "@/samples/dummy";
 import { isValidProgramCode, isValidStoreCode } from "./validator";
+import { dummyArchiveDataResponse, dummyProgramDataResponse } from "@/samples/dummy";
 
 export const fetchProgramData = async (p: string = "now"): Promise<ApiResponse<ProgramData[]>> => {
   const periodeType = parsePeriodeType(p);
   const cache = sessionStorage.getItem(periodeType);
 
   if (cache) return JSON.parse(cache) as ApiResponse<ProgramData[]>;
-  console.log("karena di local tidak ada maka ambil ke server atau dummy");
+  console.log("karena di local tidak ada program data maka ambil ke server");
 
   if (import.meta.env.DEV) {
+    console.log("karena mode dev maka pake dummy");
+    console.log("simulasi waiting 2 detik");
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    console.log("oke dummy done, tidak lupa simpan ke session storage buat dipake lagi");
     sessionStorage.setItem(periodeType, JSON.stringify(dummyProgramDataResponse));
-    console.log("tidak lupa di set dulu");
+
     return dummyProgramDataResponse;
   }
 
   try {
-    const result = await fetch(`https://psm.maruuf82.workers.dev/psm?periode=${periodeType}`);
+    const result = await fetch(`${import.meta.env.VITE_PSM_API}/psm?periode=${periodeType}`);
     const resultJson = (await result.json()) as ApiResponse<ProgramData[]>;
-    console.log("tidak lupa di set dulu");
     sessionStorage.setItem(periodeType, JSON.stringify(resultJson));
     return resultJson;
   } catch (error) {
@@ -31,29 +34,23 @@ export const fetchProgramData = async (p: string = "now"): Promise<ApiResponse<P
 export const fetchArchiveData = async (
   kode_toko: string,
   kode_program: string,
-  type: string,
-  real_fetch: boolean = false
+  periode_type: string
 ): Promise<ApiResponse<ArchiveData>> => {
   if (!isValidStoreCode(kode_toko)) return { success: false, code: 400, message: "FORMAT KODE TOKO SALAH" };
   if (!isValidProgramCode(kode_program)) return { success: false, code: 400, message: "INVALID KODE PROGRAM FORMAT" };
-  const periodeType = parsePeriodeType(type);
-
-  if (!real_fetch) {
-    const cache = sessionStorage.getItem(kode_program);
-    if (cache) return JSON.parse(cache) as ApiResponse<ArchiveData>;
-  }
+  const periodeType = parsePeriodeType(periode_type);
 
   if (import.meta.env.DEV) {
-    console.log("tidak lupa di set dulu");
     sessionStorage.setItem(kode_program, JSON.stringify(dummyArchiveDataResponse));
+    await new Promise((resolve) => setTimeout(resolve, 2000));
     return dummyArchiveDataResponse;
   }
 
   try {
     const result = await fetch(
-      `https://psm.maruuf82.workers.dev/psm/${kode_toko}/${kode_program}?periode=${periodeType}`
+      `${import.meta.env.VITE_PSM_API}/psm/${kode_toko}/${kode_program}?periode=${periodeType}`
     );
-    const resultJson = (await result.json()) as ApiResponse<ArchiveData>;
+    const resultJson = (await result.json()) as SuccessResponse<ArchiveData>;
     sessionStorage.setItem(kode_program, JSON.stringify(resultJson));
     return resultJson;
   } catch (error) {

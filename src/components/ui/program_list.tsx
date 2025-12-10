@@ -11,7 +11,10 @@ type Props = {
 
 const ProgramList: FC<Props> = ({ programData, picked, i, handlePick }) => {
   return (
-    <div className={`outline-2 p-2 ${picked ? "outline-white" : "outline-black"}`} onClick={() => handlePick(i)}>
+    <div
+      className={`outline-2 p-2 rounded ${picked ? "outline-white" : "outline-black"}`}
+      onClick={() => handlePick(i)}
+    >
       {parseItemProgramName(programData.items[0].descp)}
     </div>
   );

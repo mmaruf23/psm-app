@@ -1,4 +1,4 @@
-type SuccessResponse<T> = {
+export type SuccessResponse<T> = {
   success: true;
   code: number;
   data?: T;
