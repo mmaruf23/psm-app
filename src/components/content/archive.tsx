@@ -33,6 +33,7 @@ const ArchiveContent = () => {
       const result = await fetchArchiveData(kodeToko, kodeProgram, periodeType);
       if (!result.success) {
         toast.error(result.message, { position: "top-center" });
+        setIsLoading(false);
         return;
       }
 
