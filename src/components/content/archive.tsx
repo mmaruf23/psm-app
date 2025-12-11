@@ -1,11 +1,11 @@
 import { fetchArchiveData, fetchProgramData } from "@/helpers/fetcher";
-import type { ArchiveData, ProgramData, SuccessResponse } from "@/types";
+import type { ApiResponse, ArchiveData, ProgramData, SuccessResponse } from "@/types";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
-import CashierList from "../ui/cashier_list";
-import ItemList from "../ui/item_list";
-import ProgramList from "../ui/program_list";
-import Loader from "../ui/loader";
+import CashierList from "@/components/ui/cashier_list";
+import ItemList from "@/components/ui/item_list";
+import ProgramList from "@/components/ui/program_list";
+import Loader from "@/components/ui/loader";
 import { useLocation } from "react-router";
 
 const ArchiveContent = () => {
@@ -46,23 +46,30 @@ const ArchiveContent = () => {
 
   const handlePick = (i: number) => {
     if (i === pickedProgram) return;
+    if (isLoading) {
+      toast.info("Wait...", { position: "top-center" });
+      return;
+    }
     setPickedProgram(i);
     const kode_program = programData[i].kode_program;
     handleFetchArchiveData(kode_program);
   };
 
   const handleFetchProgramData = useCallback(async () => {
-    console.log("memulai fetching program data!");
-    const kodeToko = localStorage.getItem("kode_toko");
-    if (!kodeToko) {
-      toast.warning("Silakan set kode toko terlebih dahulu", {
-        position: "top-center",
-      });
+    const plainCache = sessionStorage.getItem(periodeType);
+    if (plainCache) {
+      const plain = JSON.parse(plainCache) as ApiResponse<ProgramData[]>;
+      if (!plain.success) {
+        toast.error(plain.message, { position: "top-center" });
+        return;
+      }
+      setProgramData(plain.data!);
+      handleFetchArchiveData(plain.data![0].kode_program);
       return;
     }
+    console.log("karena di local tidak ada program data maka ambil ke server");
 
-    // yang dari local pindahin ke sini aja ?
-    const result = await fetchProgramData();
+    const result = await fetchProgramData(periodeType);
     if (!result.success) {
       toast.error(result.message, { position: "top-center" });
       return;
@@ -70,17 +77,23 @@ const ArchiveContent = () => {
 
     setProgramData(result.data!);
     handleFetchArchiveData(result.data![0].kode_program);
-  }, [handleFetchArchiveData]);
+  }, [handleFetchArchiveData, periodeType]);
 
   useEffect(() => {
     console.log("terdeteksi location berubah!", location.pathname);
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setPeriodeType(location.pathname === "/before" ? "before" : "now");
+
+    if (!localStorage.getItem("kode_toko")) return;
     handleFetchProgramData();
   }, [location.pathname, handleFetchProgramData]);
 
   if (!localStorage.getItem("kode_toko")) {
-    return <div className="flex justify-center mt-20">silahkan set kode toko terlebih dahulu</div>;
+    return (
+      <div className="grow flex justify-center items-center font-bold text-4xl font-serif uppercase">
+        silahkan set kode toko terlebih dahulu
+      </div>
+    );
   }
 
   return (
