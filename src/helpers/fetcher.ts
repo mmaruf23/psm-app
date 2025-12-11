@@ -3,13 +3,7 @@ import { parsePeriodeType } from "./parser";
 import { isValidProgramCode, isValidStoreCode } from "./validator";
 import { dummyArchiveDataResponse, dummyProgramDataResponse } from "@/samples/dummy";
 
-export const fetchProgramData = async (p: string = "now"): Promise<ApiResponse<ProgramData[]>> => {
-  const periodeType = parsePeriodeType(p);
-  const cache = sessionStorage.getItem(periodeType);
-
-  if (cache) return JSON.parse(cache) as ApiResponse<ProgramData[]>;
-  console.log("karena di local tidak ada program data maka ambil ke server");
-
+export const fetchProgramData = async (periodeType: "now" | "before" = "now"): Promise<ApiResponse<ProgramData[]>> => {
   if (import.meta.env.DEV) {
     console.log("karena mode dev maka pake dummy");
     console.log("simulasi waiting 2 detik");
