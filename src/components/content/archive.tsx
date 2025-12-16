@@ -7,6 +7,7 @@ import ItemList from "@/components/ui/item_list";
 import ProgramList from "@/components/ui/program_list";
 import Loader from "@/components/ui/loader";
 import { useLocation } from "react-router";
+import useStoreCode from "@/hooks/store_code";
 
 const ArchiveContent = () => {
   const [programData, setProgramData] = useState<ProgramData[]>([]);
@@ -15,6 +16,8 @@ const ArchiveContent = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [periodeType, setPeriodeType] = useState<"now" | "before">("now");
   const location = useLocation();
+
+  const kodeToko = useStoreCode();
 
   const handleFetchArchiveData = useCallback(
     async (kodeProgram: string) => {
@@ -80,15 +83,15 @@ const ArchiveContent = () => {
   }, [handleFetchArchiveData, periodeType]);
 
   useEffect(() => {
-    console.log("terdeteksi location berubah!", location.pathname);
+    console.log(kodeToko);
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setPeriodeType(location.pathname === "/before" ? "before" : "now");
 
-    if (!localStorage.getItem("kode_toko")) return;
+    if (!kodeToko) return;
     handleFetchProgramData();
-  }, [location.pathname, handleFetchProgramData]);
+  }, [location.pathname, handleFetchProgramData, kodeToko]);
 
-  if (!localStorage.getItem("kode_toko")) {
+  if (!kodeToko) {
     return (
       <div className="grow flex justify-center items-center font-bold text-4xl font-serif uppercase">
         silahkan set kode toko terlebih dahulu
