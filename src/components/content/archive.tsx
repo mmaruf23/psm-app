@@ -1,4 +1,4 @@
-import { fetchArchiveData, fetchProgramData } from "@/helpers/fetcher";
+import { fetchArchiveData, fetchProgramData, fetchStoreData } from "@/helpers/fetcher";
 import type { ApiResponse, ArchiveData, ProgramData, SuccessResponse } from "@/types";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -7,7 +7,7 @@ import ItemList from "@/components/ui/item_list";
 import ProgramList from "@/components/ui/program_list";
 import Loader from "@/components/ui/loader";
 import { useLocation } from "react-router";
-import useStoreCode from "@/hooks/store_code";
+import { setStoreData, useStoreData } from "@/hooks/store_data";
 
 const ArchiveContent = () => {
   const [programData, setProgramData] = useState<ProgramData[]>([]);
@@ -17,60 +17,54 @@ const ArchiveContent = () => {
   const [periodeType, setPeriodeType] = useState<"now" | "before">("now");
   const location = useLocation();
 
-  const kodeToko = useStoreCode();
+  const storeData = useStoreData();
+
+  const handleFetchStoreData = useCallback(async (kode_toko: string, kode_program: string) => {
+    console.log("handleFetchStoreData dijalankan.");
+
+    const result = await fetchStoreData(kode_toko, kode_program);
+    if (result.success && result.data) setStoreData(result.data);
+  }, []);
 
   const handleFetchArchiveData = useCallback(
     async (kodeProgram: string) => {
-      console.log("mulai update archive data");
+      console.log("handleFetchArchiveData dijalankan.");
+
       const plainCache = sessionStorage.getItem(kodeProgram);
       if (plainCache) {
         const cache = JSON.parse(plainCache) as SuccessResponse<ArchiveData>;
         setArchiveData(cache.data!);
-        console.log("done dari cache!");
         return;
       }
 
       setIsLoading(true);
-      const kodeToko = localStorage.getItem("kode_toko")!;
 
-      const result = await fetchArchiveData(kodeToko, kodeProgram, periodeType);
+      const result = await fetchArchiveData(storeData.kd_store, kodeProgram, periodeType);
       if (!result.success) {
         toast.error(result.message, { position: "top-center" });
         setIsLoading(false);
         return;
       }
 
-      setArchiveData(result.data!);
-      console.log("done dari fetching");
       setIsLoading(false);
+      setArchiveData(result.data!);
     },
-    [periodeType]
+    [periodeType, storeData.kd_store]
   );
 
-  const handlePick = (i: number) => {
-    if (i === pickedProgram) return;
-    if (isLoading) {
-      toast.info("Wait...", { position: "top-center" });
-      return;
-    }
-    setPickedProgram(i);
-    const kode_program = programData[i].kode_program;
-    handleFetchArchiveData(kode_program);
-  };
-
   const handleFetchProgramData = useCallback(async () => {
+    console.log("handleFetchProgramData dijalankan. yang ini");
     const plainCache = sessionStorage.getItem(periodeType);
     if (plainCache) {
-      const plain = JSON.parse(plainCache) as ApiResponse<ProgramData[]>;
-      if (!plain.success) {
-        toast.error(plain.message, { position: "top-center" });
+      const cache = JSON.parse(plainCache) as ApiResponse<ProgramData[]>;
+      if (!cache.success) {
+        toast.error(cache.message, { position: "top-center" });
         return;
       }
-      setProgramData(plain.data!);
-      handleFetchArchiveData(plain.data![0].kode_program);
+      setProgramData(cache.data!);
+      handleFetchArchiveData(cache.data![0].kode_program);
       return;
     }
-    console.log("karena di local tidak ada program data maka ambil ke server");
 
     const result = await fetchProgramData(periodeType);
     if (!result.success) {
@@ -82,16 +76,42 @@ const ArchiveContent = () => {
     handleFetchArchiveData(result.data![0].kode_program);
   }, [handleFetchArchiveData, periodeType]);
 
+  const handlePick = (i: number) => {
+    if (i === pickedProgram) return;
+    if (isLoading) {
+      toast.info("Wait...", { position: "top-center" });
+      return;
+    }
+    setPickedProgram(i);
+  };
+
   useEffect(() => {
-    console.log(kodeToko);
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setPeriodeType(location.pathname === "/before" ? "before" : "now");
+    (async () => {
+      if (!storeData.kd_store) return;
+      await handleFetchProgramData();
+    })();
+  }, [handleFetchProgramData, storeData.kd_store]);
 
-    if (!kodeToko) return;
-    handleFetchProgramData();
-  }, [location.pathname, handleFetchProgramData, kodeToko]);
+  useEffect(() => {
+    (async () => {
+      const program = programData[pickedProgram];
+      if (program) await handleFetchArchiveData(program.kode_program);
+    })();
+  }, [handleFetchArchiveData, pickedProgram, programData]);
 
-  if (!kodeToko) {
+  useEffect(() => {
+    (async () => {
+      setPeriodeType(location.pathname === "/before" ? "before" : "now");
+    })();
+  }, [location.pathname]);
+
+  useEffect(() => {
+    if (!storeData.nama_store && programData.length > 0 && programData[0].kode_program) {
+      handleFetchStoreData(storeData.kd_store, programData[0].kode_program);
+    }
+  }, [handleFetchStoreData, programData, storeData.kd_store, storeData.nama_store]);
+
+  if (!storeData.kd_store) {
     return (
       <div className="grow flex justify-center items-center font-bold text-4xl font-serif uppercase">
         silahkan set kode toko terlebih dahulu
@@ -103,7 +123,13 @@ const ArchiveContent = () => {
     <div className="flex flex-col h-full gap-4">
       <div className="min-h-20 flex flex-wrap gap-4 items-center">
         {programData.map((p, i) => (
-          <ProgramList key={i} i={i} handlePick={handlePick} picked={i === pickedProgram} programData={p} />
+          <ProgramList
+            key={p.kode_program}
+            i={i}
+            handlePick={handlePick}
+            picked={i === pickedProgram}
+            programData={p}
+          />
         ))}
       </div>
       <div className="grow outline flex gap-4">
@@ -127,7 +153,7 @@ const ArchiveContent = () => {
             <span className="w-1/12">REG</span>
             <span className="w-1/12">NAS</span>
           </div>
-          {archiveData && archiveData.cashier.map((acv, i) => <CashierList key={i} acv={acv} />)}
+          {archiveData && archiveData.cashier.map((acv) => <CashierList key={acv.nik} acv={acv} />)}
           {isLoading && <Loader />}
         </div>
       </div>
