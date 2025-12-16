@@ -1,17 +1,23 @@
-import useStoreCode from "@/hooks/store_code";
+import type { StoreData } from "@/types";
 import { SettingsIcon, MSquare, X } from "lucide-react";
-import { useState, type ChangeEvent } from "react";
+import { useRef, useState } from "react";
+import { Button } from "./button";
+import { setStoreData, useStoreData } from "@/hooks/store_data";
 
 const Topbar = () => {
-  const kodeToko = useStoreCode();
-  const [showDialog, setShowDialog] = useState<boolean>(!kodeToko);
+  const storeData = useStoreData();
 
-  const handleSet = (e: ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    if (value.length !== 4) return;
+  const [showDialog, setShowDialog] = useState<boolean>(false);
+  const inputRef = useRef<HTMLInputElement>(null);
 
-    localStorage.setItem("kode_toko", value);
-    window.dispatchEvent(new Event("kode_toko"));
+  const handleSet = async () => {
+    const value = inputRef.current?.value;
+    if (!value || value.length !== 4) return;
+    if (value === storeData.kd_store) return;
+
+    const newStoreData: StoreData = { cabang: "", kd_store: value, nama_store: "" };
+
+    setStoreData(newStoreData);
   };
 
   return (
@@ -20,8 +26,9 @@ const Topbar = () => {
         <div className="w-20">
           <MSquare />
         </div>
+
         <div className="text-white font-serif text-2xl font-semibold px-2 border-x-2 rounded-tl-2xl rounded-br-2xl">
-          {kodeToko}
+          {storeData.nama_store || storeData.kd_store}
         </div>
         <div className="w-20 flex justify-end">
           <SettingsIcon onClick={() => setShowDialog((p) => !p)} />
@@ -36,12 +43,8 @@ const Topbar = () => {
               <div onClick={() => setShowDialog(false)} className="absolute right-0 top-0">
                 <X className="p-1.5 text-white bg-black rounded-tr-md" size={40} />
               </div>
-              <input
-                className="bg-white px-2 py-1 rounded"
-                type="text"
-                onChange={handleSet}
-                placeholder="Kode Toko.."
-              />
+              <input ref={inputRef} className="bg-white px-2 py-1 rounded" type="text" placeholder="Kode Toko.." />
+              <Button onClick={() => handleSet()}>Set</Button>
             </div>
           </div>
         </div>

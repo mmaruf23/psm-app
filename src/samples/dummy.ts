@@ -1,4 +1,4 @@
-import type { ApiResponse, ArchiveData, ProgramData } from "@/types";
+import type { ApiResponse, ArchiveData, ProgramData, StoreData } from "@/types";
 
 export const dummyProgramDataResponse: ApiResponse<ProgramData[]> = {
   success: true,
@@ -405,5 +405,15 @@ export const dummyArchiveDataResponse: ApiResponse<ArchiveData> = {
         pos_nas: "0",
       },
     ],
+  },
+};
+
+export const dummyStoreData: ApiResponse<StoreData> = {
+  success: true,
+  code: 200,
+  data: {
+    cabang: "CILEUNGSI_2",
+    kd_store: "J599",
+    nama_store: "SAT KOMARUDIN 2 [KMR2]",
   },
 };
