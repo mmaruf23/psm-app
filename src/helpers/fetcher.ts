@@ -52,3 +52,8 @@ export const fetchArchiveData = async (
     return { success: false, code: 400, message: "fail sending request to server api" };
   }
 };
+
+export const fetchStoreInfo = async (kode_toko: string, kode_program: string) => {
+  if (!isValidStoreCode(kode_toko)) return { success: false, code: 400, message: "FORMAT KODE TOKO SALAH" };
+  if (!isValidProgramCode(kode_program)) return { success: false, code: 400, message: "INVALID KODE PROGRAM FORMAT" };
+};
