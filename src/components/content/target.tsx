@@ -1,5 +1,5 @@
 const TargetContent = () => {
-  return <div>Ini Target Content</div>;
+  return <div>Masih dalam pengembangan.</div>;
 };
 
 export default TargetContent;

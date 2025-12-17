@@ -9,7 +9,7 @@ type Props = {
 
 const ItemList: FC<Props> = ({ item }) => {
   return (
-    <li className="mb-2">
+    <li className="lg:mb-2 text-sm lg:text-lg">
       <span className="line-clamp-1">
         {item.plu} {item.descp}
       </span>
