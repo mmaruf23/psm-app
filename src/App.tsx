@@ -11,7 +11,7 @@ function App() {
       <Topbar />
       <div className="grow flex bg-chart-1 pb-10 md:pb-0">
         <Sidebar />
-        <div className="grow flex flex-col bg-chart-2 rounded-tl-2xl p-4">
+        <div className="grow flex flex-col bg-chart-2 lg:rounded-tr-none rounded-t-2xl p-4 max-w-svw overflow-auto">
           <Outlet />
         </div>
       </div>

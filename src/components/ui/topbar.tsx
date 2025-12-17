@@ -27,7 +27,7 @@ const Topbar = () => {
           <MSquare />
         </div>
 
-        <div className="text-white font-serif text-2xl font-semibold px-2 border-x-2 rounded-tl-2xl rounded-br-2xl">
+        <div className="text-white font-serif text-sm text-center lg:text-2xl font-semibold px-2 border-x-2 rounded-tl-2xl rounded-br-2xl">
           {storeData.nama_store || storeData.kd_store}
         </div>
         <div className="w-20 flex justify-end">
