@@ -14,7 +14,7 @@ const ArchiveContent = () => {
   const [archiveData, setArchiveData] = useState<ArchiveData | null>(null);
   const [pickedProgram, setPickedProgram] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [periodeType, setPeriodeType] = useState<"now" | "before">("now");
+  const [periodeType, setPeriodeType] = useState<"now" | "before" | null>(null);
   const location = useLocation();
 
   const storeData = useStoreData();
@@ -28,8 +28,7 @@ const ArchiveContent = () => {
 
   const handleFetchArchiveData = useCallback(
     async (kodeProgram: string) => {
-      console.log("handleFetchArchiveData dijalankan.");
-
+      if (!periodeType) return;
       const plainCache = sessionStorage.getItem(kodeProgram);
       if (plainCache) {
         const cache = JSON.parse(plainCache) as SuccessResponse<ArchiveData>;
@@ -38,7 +37,6 @@ const ArchiveContent = () => {
       }
 
       setIsLoading(true);
-
       const result = await fetchArchiveData(storeData.kd_store, kodeProgram, periodeType);
       if (!result.success) {
         toast.error(result.message, { position: "top-center" });
@@ -52,31 +50,33 @@ const ArchiveContent = () => {
     [periodeType, storeData.kd_store]
   );
 
-  const handleFetchProgramData = useCallback(async () => {
-    console.log("handleFetchProgramData dijalankan. yang ini");
-    const plainCache = sessionStorage.getItem(periodeType);
-    if (plainCache) {
-      const cache = JSON.parse(plainCache) as ApiResponse<ProgramData[]>;
-      if (!cache.success) {
-        toast.error(cache.message, { position: "top-center" });
+  const handleFetchProgramData = useCallback(
+    async (ptype: "now" | "before") => {
+      const plainCache = sessionStorage.getItem(ptype);
+      if (plainCache) {
+        const cache = JSON.parse(plainCache) as ApiResponse<ProgramData[]>;
+        if (!cache.success) {
+          toast.error(cache.message, { position: "top-center" });
+          setProgramData([]);
+          return;
+        }
+        setProgramData(cache.data!);
+        handleFetchArchiveData(cache.data![0].kode_program);
+        return;
+      }
+
+      const result = await fetchProgramData(ptype);
+      if (!result.success) {
+        toast.error(result.message, { position: "top-center" });
         setProgramData([]);
         return;
       }
-      setProgramData(cache.data!);
-      handleFetchArchiveData(cache.data![0].kode_program);
-      return;
-    }
 
-    const result = await fetchProgramData(periodeType);
-    if (!result.success) {
-      toast.error(result.message, { position: "top-center" });
-      setProgramData([]);
-      return;
-    }
-
-    setProgramData(result.data!);
-    handleFetchArchiveData(result.data![0].kode_program);
-  }, [handleFetchArchiveData, periodeType]);
+      setProgramData(result.data!);
+      handleFetchArchiveData(result.data![0].kode_program);
+    },
+    [handleFetchArchiveData]
+  );
 
   const handlePick = (i: number) => {
     if (i === pickedProgram) return;
@@ -89,10 +89,9 @@ const ArchiveContent = () => {
 
   useEffect(() => {
     (async () => {
-      if (!storeData.kd_store) return;
-      await handleFetchProgramData();
+      setPeriodeType(location.pathname === "/before" ? "before" : "now");
     })();
-  }, [handleFetchProgramData, storeData.kd_store]);
+  }, [location.pathname]);
 
   useEffect(() => {
     (async () => {
@@ -103,12 +102,13 @@ const ArchiveContent = () => {
 
   useEffect(() => {
     (async () => {
-      setPeriodeType(location.pathname === "/before" ? "before" : "now");
+      if (!storeData.kd_store || !periodeType) return;
+      await handleFetchProgramData(periodeType);
     })();
-  }, [location.pathname]);
+  }, [handleFetchProgramData, periodeType, storeData.kd_store]);
 
   useEffect(() => {
-    if (!storeData.nama_store && programData.length > 0 && programData[0].kode_program) {
+    if (!storeData.nama_store && programData.length > 0) {
       handleFetchStoreData(storeData.kd_store, programData[0].kode_program);
     }
   }, [handleFetchStoreData, programData, storeData.kd_store, storeData.nama_store]);
