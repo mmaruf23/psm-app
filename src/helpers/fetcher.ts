@@ -4,7 +4,7 @@ import { isValidProgramCode, isValidStoreCode } from "./validator";
 import { dummyArchiveDataResponse, dummyProgramDataResponse, dummyStoreData } from "@/samples/dummy";
 
 export const fetchProgramData = async (periodeType: "now" | "before" = "now"): Promise<ApiResponse<ProgramData[]>> => {
-  if (import.meta.env.DEV) {
+  if (import.meta.env.DEV && import.meta.env.VITE_PSM_API) {
     await new Promise((resolve) => setTimeout(resolve, 2000));
     sessionStorage.setItem(periodeType, JSON.stringify(dummyProgramDataResponse));
 
@@ -31,7 +31,7 @@ export const fetchArchiveData = async (
   if (!isValidProgramCode(kode_program)) return { success: false, code: 400, message: "INVALID KODE PROGRAM FORMAT" };
   const periodeType = parsePeriodeType(periode_type);
 
-  if (import.meta.env.DEV) {
+  if (import.meta.env.DEV && import.meta.env.VITE_PSM_API) {
     sessionStorage.setItem(kode_program, JSON.stringify(dummyArchiveDataResponse));
     await new Promise((resolve) => setTimeout(resolve, 2000));
     return dummyArchiveDataResponse;
@@ -41,6 +41,7 @@ export const fetchArchiveData = async (
     const result = await fetch(
       `${import.meta.env.VITE_PSM_API}/psm/${kode_toko}/${kode_program}?periode=${periodeType}`
     );
+
     const resultJson = (await result.json()) as SuccessResponse<ArchiveData>;
     sessionStorage.setItem(kode_program, JSON.stringify(resultJson));
     return resultJson;
@@ -59,7 +60,7 @@ export const fetchStoreData = async (kode_toko: string, kode_program: string): P
     return JSON.parse(cache) as SuccessResponse<StoreData>;
   }
 
-  if (import.meta.env.DEV) {
+  if (import.meta.env.DEV && import.meta.env.VITE_PSM_API) {
     await new Promise((resolve) => setTimeout(resolve, 2000));
     return dummyStoreData;
   }
